@@ -1,4 +1,6 @@
-const fs = require('fs');
+const { Movie } = require("./models.js");
+const { users } = require("./users.js");
+require('./mongodb.js');
 
 const save = (updatedArr) => {
     let stringyObj = JSON.stringify(updatedArr)
@@ -9,6 +11,17 @@ exports.add = (movieListArr, input) => {
     let movieObj = {movie: input};
     movieListArr.push(movieObj);
     save(movieListArr)
+}
+exports.findMovie = (movieListArr, input)=>{
+    let spliceIndex;
+    movieListArr.map((movie,index)=>{
+        if (movie.movie === input){
+            spliceIndex = index
+            console.log(`Your search found ${input}.`)
+        }else{
+            console.log(`Found No`)
+        }
+    })
 }
 
 exports.deleteMovie = (movieListArr, input) => {
