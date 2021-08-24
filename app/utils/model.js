@@ -21,4 +21,5 @@ const Movie = mongoose.model(
 );
 
 module.exports = {
-    Movie}
+    Movie
+}

@@ -1,67 +1,54 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-
-const fs = require('fs');
+require("dotenv").config();
+const mongoose = require("mongoose");
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
-const { findMovie } = require('./utils');
+
 const argv = yargs(hideBin(process.argv)).argv;
+const { createMovie, findAll, updateMovie, deleteMovie, addUser} = require('./utils');
+const { connection } = require("./utils/mysql.js");
 
-mongoose.connect(
-    `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`,
-    { useNewUrlParser: true, useUnifiedTopology: true }
-);
+const mongoMovie = async () => {     
+    if (argv.add) {
+        await createMovie(argv.name, argv.year, argv.director); 
+    } else if (argv.find) {
+        await findAll();
+    } else if (argv.updateMovie) {
+        await updateMovie(argv.updatename, argv.newname);
+    } else if (argv.delete) {
+        await deleteMovie(argv.name)
+    } else if (argv.deleteall) {
+        await deleteAll();
+    }    
+    process.exit();
+}; 
+// mongoMovie();
 
-const connection = mongoose.connection
-
-connection.once("open", () => {
-    console.log("Welcome to Netflix App")
-})
-
-const movies = new mongoose.model(
-    'movies',
-    {
-        title: {
-            type: String,
-            required: true
-        },
-        genre: {
-            type: String
-        },
-        language: {
-            type: String
-        },
-        year: {
-            type: Number
-        },
-        director: {
-            type: String
-    }
-    })
-
-
-  const main = ()=> {
-    let movieListArr
+  const sqlMovie = async()=> {
+      console.log("sqlMovie is playing")
     try {
-        movieListArr = JSON.parse(fs.readFileSync('./netflix.json'));
+        await connection.authenticate();
+        console.log("Connection is established")
+        if(argv.addUser){
+            await addUser(argv.name, argv.movieid);
+            console.log("added user")
+        } else if (argv.update) {
+            await updateUser(argv.name, argv.newname);
+            console.log(`Updated ${argv.name}`)
+        } else if (argv.find) {
+            await findCustomer(argv.name);
+        }
+        else if (argv.deletecustomer) {
+            await deleteCustomer(argv.name);
+        }
+
+        process.exit();
     } catch (error) {
-        movieListArr = [];
+        console.log(`Connection has not been established: ${error}`);
     }
+};
 
-    if (argv.add){
-        add(movieListArr, argv.add);
-    }else if(argv.deleteMovie){
-        deleteMovie(movieListArr, argv.deleteMovie);
-    }else if(argv.findMovie){
-        findMovie(movieListArr, argv.findMovie);
-    }else if(argv.updateMovie){
-        updateMovie(movieListArr, argv.updateMovie);
-        }else{
-        console.log(" Invalid Option");
-    }
-  }
-  main();
+  sqlMovie();
 
 
-  
+
 

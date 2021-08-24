@@ -1,57 +1,74 @@
 const { Movie } = require("./models.js");
 const { users } = require("./users.js");
 require('./mongodb.js');
+ 
+//mongodb functions
+const createMovie = async (name, year, director) => {
+    const newMovie = new Movie({name, year, director});
+    await newMovie.save();
+    console.log(newMovie);
+  };
 
-const save = (updatedArr) => {
-    let stringyObj = JSON.stringify(updatedArr)
-    fs.writeFileSync('./netflix.json', stringyObj)
+const findAll = async () => {
+  const movieFindAll = await Movie.find({});
+  console.log(movieFindAll);
 }
+const updateMovie = async (updateName, newName) => {
+    const movieUpdate = await Movie.updateOne({name: updateName}, {$set:{name: newName}});
+    console.log(movieUpdate);    
+  }
+const deleteMovie = async (name) => {
+  await Movie.deleteOne({name: name});
+  console.log(`${name} has been removed`);
+} 
+// SQL functions
 
-exports.add = (movieListArr, input) => {
-    let movieObj = {movie: input};
-    movieListArr.push(movieObj);
-    save(movieListArr)
-}
-exports.findMovie = (movieListArr, input)=>{
-    let spliceIndex;
-    movieListArr.map((movie,index)=>{
-        if (movie.movie === input){
-            spliceIndex = index
-            console.log(`Your search found ${input}.`)
-        }else{
-            console.log(`Found No`)
-        }
-    })
-}
-
-exports.deleteMovie = (movieListArr, input) => {
-    let spliceIndex;
-    movieListArr.map((movie, index) => {
-        if (movie.movie === input) {
-            spliceIndex = index
-        }
-    })
-    if (spliceIndex >= 0) {
-        movieListArr.splice(spliceIndex, 1);
-        save(movieListArr)
-    } else {
-        console.log("Movie doesn't exist")
-    }
+const addFilm = async (name, movieId) => {
+    console.log('film has been added')
+    const film = film.build({
+      name: name,
+      movie_id: movieId
+    });
+  
+    await film.save();
+    console.log(`Added: ${users.name}.`)
     
-}
-
-exports.updateMovie = (movieListArr, input, updateInput) => {
-    let spliceIndex;
-    movieListArr.map((movie, index) => {
-        if (movie.movie === input) {
-            spliceIndex = index;
-        }
-    })
-    try {
-        movieListArr[spliceIndex].movie = updateInput;
-        save(movieListArr);
-    } catch (error) {
-        console.log("Movie doesn't exist");
+  }
+  
+  const updatefilm = async (name, newName) => {
+    const film = await film.update(
+      {name: newName},
+      {where: {name: name}}
+    );
+  
+    console.log(`Updated ${name} to ${newName}`)
+  }
+  
+  const findfilm= async (name) => {
+    const film = await film.findAll(
+      {where: {name: name}}
+    );
+  
+    for (let cust of customer) {
+      console.log(`Customer: ${cust.name}`)
     }
-    
-}
+  }
+  
+  const deleteFilm= async (name) => {
+    const film = await film.destroy(
+      {where: {name}}
+    );
+  
+    console.log(`Customer ${name} removed from database`);
+  }
+
+module.exports = {
+    createMovie,
+    findAll,
+    updateMovie,
+    deleteMovie,
+    addFilm,
+    updatefilm,
+    findfilm,
+    deleteFilm
+  }
